@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import User from '../models/User.js';
 
 /**
@@ -40,15 +40,21 @@ const generateOTP = () => {
 };
 
 /**
- * Khởi tạo Resend client
+ * Tạo SMTP transporter dùng Gmail App Password
  */
-const getResendClient = () => {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('⚠️ RESEND_API_KEY chưa được cấu hình!');
+const createSMTPTransporter = () => {
+  const smtpEmail = process.env.SMTP_EMAIL;
+  const smtpPassword = process.env.SMTP_PASSWORD;
+  if (!smtpEmail || !smtpPassword) {
+    console.warn('⚠️ SMTP_EMAIL hoặc SMTP_PASSWORD chưa được cấu hình!');
     return null;
   }
-  return new Resend(apiKey);
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { user: smtpEmail, pass: smtpPassword }
+  });
 };
 
 /**
@@ -64,48 +70,39 @@ const buildOTPHtml = (userName, otpCode) => `
 `;
 
 /**
- * Gửi OTP qua Resend (không bị chặn bởi Cloud platforms)
+ * Gửi OTP qua Gmail SMTP (nodemailer) — hoạt động được trên Render
  */
 const sendOTPEmail = async (email, otpCode, userName) => {
-  const resend = getResendClient();
-  if (!resend) {
-    console.warn(`⚠️ Resend chưa cấu hình. OTP for ${email}: ${otpCode}`);
+  const transporter = createSMTPTransporter();
+  if (!transporter) {
+    console.warn(`⚠️ SMTP chưa cấu hình. OTP for ${email}: ${otpCode}`);
     global.lastEmailStatus = {
       success: false,
-      error: 'Resend client not configured',
+      error: 'SMTP transporter not configured (SMTP_EMAIL/SMTP_PASSWORD missing)',
       timestamp: new Date().toISOString()
     };
     return false;
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Taekwondo PTIT <onboarding@resend.dev>',
-      to: [email],
-      subject: '🔐 Mã OTP Đăng Nhập - Taekwondo PTIT Finance',
+    const smtpEmail = process.env.SMTP_EMAIL;
+    const info = await transporter.sendMail({
+      from: `"Taekwondo PTIT" <${smtpEmail}>`,
+      to: email,
+      subject: '🔐 Mã OTP Đăng Nhập - Taekwondo PTIT',
       html: buildOTPHtml(userName, otpCode)
     });
 
-    if (error) {
-      console.error('❌ Resend error:', error);
-      global.lastEmailStatus = {
-        success: false,
-        error: error,
-        timestamp: new Date().toISOString()
-      };
-      return false;
-    }
-
-    console.log(`✅ OTP email sent via Resend to ${email} | ID: ${data.id}`);
+    console.log(`✅ OTP email sent via Gmail SMTP to ${email} | MessageID: ${info.messageId}`);
     global.lastEmailStatus = {
       success: true,
-      emailId: data.id,
+      messageId: info.messageId,
       recipient: email,
       timestamp: new Date().toISOString()
     };
     return true;
   } catch (err) {
-    console.error('❌ Resend exception:', err.message);
+    console.error('❌ SMTP exception:', err.message);
     global.lastEmailStatus = {
       success: false,
       error: err.message,
@@ -114,6 +111,7 @@ const sendOTPEmail = async (email, otpCode, userName) => {
     return false;
   }
 };
+
 
 /**
  * @route   POST /api/auth/register
