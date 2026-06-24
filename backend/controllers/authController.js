@@ -1,0 +1,559 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
+import User from '../models/User.js';
+
+/**
+ * Tạo JWT token
+ */
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: '7d'
+  });
+};
+
+/**
+ * Format user data để trả về client (loại bỏ password)
+ */
+const formatUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  subRole: user.subRole || '',
+  maHoiVien: user.maHoiVien || '',
+  avatarUrl: user.avatarUrl,
+  phone: user.phone || '',
+  dob: user.dob || '',
+  gender: user.gender || 'Nam',
+  studentId: user.studentId || '',
+  attendanceStatus: user.attendanceStatus || 'pending',
+  lastEvaluated: user.lastEvaluated || ''
+});
+
+/**
+ * Generate 6-digit OTP code
+ */
+const generateOTP = () => {
+  return crypto.randomInt(100000, 999999).toString();
+};
+
+/**
+ * Tạo Nodemailer transporter cho Gmail SMTP
+ */
+const createMailTransporter = () => {
+  const emailUser = process.env.SMTP_EMAIL;
+  const emailPass = process.env.SMTP_PASSWORD;
+  
+  if (!emailUser || !emailPass) {
+    console.log('⚠️ SMTP chưa cấu hình (SMTP_EMAIL / SMTP_PASSWORD) → Fallback console mode');
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL/TLS
+    auth: {
+      user: emailUser,
+      pass: emailPass
+    },
+    tls: {
+      rejectUnauthorized: false // Avoid connection issues with self-signed certs
+    }
+  });
+};
+
+/**
+ * Send OTP via email - Gửi email thật qua Gmail SMTP
+ * Fallback: In OTP ra console nếu SMTP chưa cấu hình
+ */
+const sendOTPEmail = async (email, otpCode, userName) => {
+  const transporter = createMailTransporter();
+
+  // ===== FALLBACK: Console mode nếu SMTP chưa cấu hình =====
+  if (!transporter) {
+    console.log('\n' + '='.repeat(70));
+    console.log('📧 OTP EMAIL (CONSOLE FALLBACK - Cấu hình SMTP để gửi email thật)');
+    console.log('='.repeat(70));
+    console.log(`📬 To: ${email}`);
+    console.log(`👤 Name: ${userName}`);
+    console.log(`🔐 OTP Code: ${otpCode}`);
+    console.log(`⏱️  Valid for: 5 minutes`);
+    console.log('='.repeat(70) + '\n');
+    return false; // SMTP chưa cấu hình → Self-Healing: expose OTP trong response
+  }
+
+  // ===== GỬI EMAIL THẬT qua Gmail SMTP =====
+  try {
+    const htmlContent = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%); padding: 32px 24px; text-align: center;">
+          <h1 style="color: #ffffff; font-size: 22px; margin: 0 0 6px 0; font-weight: 800; letter-spacing: 1px;">🥋 TAEKWONDO PTIT</h1>
+          <p style="color: #93c5fd; font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Hệ Thống Quản Lý Tài Chính CLB</p>
+        </div>
+        
+        <!-- Body -->
+        <div style="padding: 32px 28px;">
+          <p style="color: #334155; font-size: 15px; margin: 0 0 20px 0; line-height: 1.6;">
+            Xin chào <strong style="color: #1e3a8a;">${userName}</strong>,
+          </p>
+          <p style="color: #475569; font-size: 14px; margin: 0 0 24px 0; line-height: 1.6;">
+            Bạn vừa yêu cầu đăng nhập vào hệ thống quản lý tài chính CLB Taekwondo PTIT. Đây là mã xác thực OTP của bạn:
+          </p>
+          
+          <!-- OTP Code Box -->
+          <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 2px solid #bfdbfe; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
+            <p style="color: #64748b; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Mã OTP của bạn</p>
+            <p style="color: #1e3a8a; font-size: 36px; font-weight: 900; margin: 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otpCode}</p>
+          </div>
+          
+          <!-- Warning -->
+          <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 0 0 24px 0;">
+            <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+              ⏱️ Mã OTP có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai.
+            </p>
+          </div>
+          
+          <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;">
+            Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center;">
+          <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+            © 2026 Taekwondo PTIT Club — Hệ thống quản lý tài chính CLB
+          </p>
+        </div>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: `"Taekwondo PTIT Finance" <${process.env.SMTP_EMAIL}>`,
+      to: email,
+      subject: '🔐 Mã OTP Đăng Nhập - Taekwondo PTIT Finance',
+      html: htmlContent
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    
+    console.log('\n' + '='.repeat(70));
+    console.log('✅ OTP EMAIL SENT SUCCESSFULLY');
+    console.log('='.repeat(70));
+    console.log(`📬 To: ${email}`);
+    console.log(`👤 Name: ${userName}`);
+    console.log(`📧 Message ID: ${info.messageId}`);
+    console.log(`🔐 OTP Code: ${otpCode}`);
+    console.log('='.repeat(70) + '\n');
+    
+    return true;
+  } catch (error) {
+    console.error('\n❌ EMAIL SEND FAILED:', error.message);
+    console.log('⚠️ Self-Healing: OTP hiển thị trong console và sẽ được expose trong response');
+    console.log(`🔐 OTP Code: ${otpCode}`);
+    console.log(`📬 To: ${email}\n`);
+    return false; // Gửi email thật thất bại → Self-Healing: expose OTP trong response
+  }
+};
+
+/**
+ * @route   POST /api/auth/register
+ * @desc    Đăng ký tài khoản mới (Regular Members only)
+ * @access  Public
+ */
+export const register = async (req, res) => {
+  try {
+    const { name, email, password, maHoiVien } = req.body;
+
+    // Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng điền đầy đủ thông tin.'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 6 ký tự.'
+      });
+    }
+
+    // Check email đã tồn tại
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email này đã được đăng ký.'
+      });
+    }
+
+    // Hash password với bcrypt (12 rounds)
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Xử lý avatar URL nếu có upload file
+    let avatarUrl = '';
+    if (req.file) {
+      avatarUrl = `/uploads/${req.file.filename}`;
+    }
+
+    // Tạo user mới - Default role is Member
+    const user = await User.create({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      avatarUrl,
+      role: 'Member',
+      subRole: '',
+      ...(maHoiVien && { maHoiVien })
+    });
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    res.status(201).json({
+      success: true,
+      message: 'Đăng ký thành công!',
+      user: formatUser(user),
+      token
+    });
+  } catch (error) {
+    console.error('Register Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server. Vui lòng thử lại.'
+    });
+  }
+};
+
+/**
+ * @route   POST /api/auth/login
+ * @desc    Đăng nhập - Phase 1: Email/Password validation
+ *          - Regular Members: Direct login with JWT
+ *          - Admins (Super-Admin & Sub-Admin): Generate OTP, require verification
+ * @access  Public
+ */
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    console.log('\n🔐 LOGIN ATTEMPT');
+    console.log('Email:', email);
+    console.log('Password length:', password?.length);
+
+    // Validate input
+    if (!email || !password) {
+      console.log('❌ Missing email or password');
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập email và mật khẩu.'
+      });
+    }
+
+    // Tìm user theo email
+    console.log('🔍 Looking for user:', email.toLowerCase());
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      console.log('❌ User not found');
+      return res.status(401).json({
+        success: false,
+        message: 'Email hoặc mật khẩu không đúng.'
+      });
+    }
+
+    console.log('✅ User found:', user.name, '- Role:', user.role);
+
+    // So sánh password
+    console.log('🔐 Comparing password...');
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+    
+    if (!isMatch) {
+      console.log('❌ Password does not match');
+      return res.status(401).json({
+        success: false,
+        message: 'Email hoặc mật khẩu không đúng.'
+      });
+    }
+
+    // Check if user is Admin (Super-Admin or Sub-Admin)
+    const isAdmin = user.role === 'Super-Admin' || user.role === 'Sub-Admin';
+
+    if (isAdmin) {
+      // ADMIN LOGIN: Generate OTP and send via email
+      const otpCode = generateOTP();
+      const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+      // Save OTP to database
+      await User.findByIdAndUpdate(user._id, {
+        $set: { otpCode, otpExpires }
+      });
+
+      // Send OTP via email — nhận kết quả để kiểm tra Self-Healing
+      const emailSentSuccessfully = await sendOTPEmail(user.email, otpCode, user.name);
+
+      // Self-Healing logic: Expose OTP nếu email không gửi được
+      const shouldExposeOtp = !emailSentSuccessfully;
+      const responseData = {
+        success: true,
+        requireOTP: true,
+        message: emailSentSuccessfully
+          ? 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
+          : `⚠️ SMTP lỗi — Mã OTP: ${otpCode} (Self-Healing Mode)`,
+        userId: user._id,
+        email: user.email
+      };
+
+      // Self-Healing: Expose OTP trong response nếu email thất bại
+      if (shouldExposeOtp) {
+        responseData.otpCode = otpCode;
+      }
+
+      return res.status(200).json(responseData);
+    } else {
+      // REGULAR MEMBER LOGIN: Direct login with JWT
+      const token = generateToken(user._id);
+
+      return res.status(200).json({
+        success: true,
+        requireOTP: false,
+        message: 'Đăng nhập thành công!',
+        user: formatUser(user),
+        token
+      });
+    }
+  } catch (error) {
+    console.error('Login Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server. Vui lòng thử lại.'
+    });
+  }
+};
+
+/**
+ * @route   POST /api/auth/verify-otp
+ * @desc    Verify OTP for Admin login - Phase 2
+ * @access  Public
+ */
+export const verifyOTP = async (req, res) => {
+  try {
+    const { userId, otpCode } = req.body;
+
+    console.log('\n🔐 VERIFY OTP ATTEMPT');
+    console.log('UserId:', userId);
+    console.log('OTP Code received:', otpCode);
+
+    if (!userId || !otpCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập mã OTP.'
+      });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log('❌ User not found for ID:', userId);
+      return res.status(404).json({
+        success: false,
+        message: 'Người dùng không tồn tại.'
+      });
+    }
+
+    console.log('✅ User found:', user.name);
+    console.log('📦 Stored OTP:', user.otpCode);
+    console.log('⏱️  OTP Expires:', user.otpExpires);
+    console.log('⏱️  Now:', new Date());
+
+    // Check OTP expiration — ensure Date comparison is correct
+    const expiresDate = user.otpExpires ? new Date(user.otpExpires) : null;
+    if (!expiresDate || new Date() > expiresDate) {
+      console.log('❌ OTP expired');
+      return res.status(400).json({
+        success: false,
+        message: 'Mã OTP đã hết hạn. Vui lòng đăng nhập lại.'
+      });
+    }
+
+    // Verify OTP — trim both sides for safety
+    const storedOTP = (user.otpCode || '').trim();
+    const receivedOTP = (otpCode || '').trim();
+    
+    if (storedOTP !== receivedOTP) {
+      console.log('❌ OTP mismatch. Stored:', storedOTP, 'Received:', receivedOTP);
+      return res.status(400).json({
+        success: false,
+        message: 'Mã OTP không chính xác.'
+      });
+    }
+
+    console.log('✅ OTP verified successfully!');
+
+    // Clear OTP after successful verification
+    await User.findByIdAndUpdate(userId, {
+      $set: { otpCode: '', otpExpires: null }
+    });
+
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Xác thực OTP thành công! Đăng nhập hoàn tất.',
+      user: formatUser(user),
+      token
+    });
+  } catch (error) {
+    console.error('Verify OTP Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server. Vui lòng thử lại.'
+    });
+  }
+};
+
+/**
+ * @route   POST /api/auth/resend-otp
+ * @desc    Resend OTP for Admin login
+ * @access  Public
+ */
+export const resendOTP = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Thiếu thông tin người dùng.'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Người dùng không tồn tại.'
+      });
+    }
+
+    // Generate new OTP
+    const otpCode = generateOTP();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    // Update OTP in database
+    await User.findByIdAndUpdate(userId, {
+      $set: { otpCode, otpExpires }
+    });
+
+    // Send OTP via email — Self-Healing
+    const emailSentSuccessfully = await sendOTPEmail(user.email, otpCode, user.name);
+
+    res.status(200).json({
+      success: true,
+      message: emailSentSuccessfully
+        ? 'Mã OTP mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
+        : `⚠️ SMTP lỗi — Mã OTP: ${otpCode} (Self-Healing Mode)`,
+      ...( !emailSentSuccessfully && { otpCode } ) // Self-Healing: expose OTP nếu gửi mail thất bại
+    });
+  } catch (error) {
+    console.error('Resend OTP Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server. Vui lòng thử lại.'
+    });
+  }
+};
+
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Đăng xuất (stateless JWT - chủ yếu xử lý ở client)
+ * @access  Private
+ */
+export const logout = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'Đăng xuất thành công!'
+    });
+  } catch (error) {
+    console.error('Logout Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server.'
+    });
+  }
+};
+
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Lấy thông tin profile user hiện tại
+ * @access  Private
+ */
+export const getProfile = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      user: formatUser(req.user)
+    });
+  } catch (error) {
+    console.error('GetProfile Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server.'
+    });
+  }
+};
+
+/**
+ * @route   POST /api/auth/seed-super-admin
+ * @desc    Seed Super Admin account (tunav602@gmail.com) - Run once
+ * @access  Public (Should be protected in production or run via script)
+ */
+export const seedSuperAdmin = async (req, res) => {
+  try {
+    const SUPER_ADMIN_EMAIL = 'tunav602@gmail.com';
+    const SUPER_ADMIN_PASSWORD = 'Tuanvietnguyen123';
+    const SUPER_ADMIN_NAME = 'Tuấn Việt Nguyễn';
+
+    // Check if Super Admin already exists
+    const existingSuperAdmin = await User.findOne({ email: SUPER_ADMIN_EMAIL });
+    if (existingSuperAdmin) {
+      return res.status(400).json({
+        success: false,
+        message: 'Super Admin đã tồn tại trong hệ thống.'
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, salt);
+
+    // Create Super Admin
+    const superAdmin = await User.create({
+      name: SUPER_ADMIN_NAME,
+      email: SUPER_ADMIN_EMAIL,
+      password: hashedPassword,
+      role: 'Super-Admin',
+      subRole: '',
+      avatarUrl: ''
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Super Admin đã được tạo thành công!',
+      user: formatUser(superAdmin)
+    });
+  } catch (error) {
+    console.error('Seed Super Admin Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi tạo Super Admin.'
+    });
+  }
+};

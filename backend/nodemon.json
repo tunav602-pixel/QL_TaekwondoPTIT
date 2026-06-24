@@ -1,0 +1,15 @@
+{
+  "ignore": [
+    "data/users.json",
+    "data/*.json",
+    "backend/data/*",
+    "backend/data/users.json",
+    "**/data/**",
+    "uploads/*",
+    "uploads/**",
+    "**/uploads/**",
+    "node_modules/*",
+    "node_modules/**",
+    "**/node_modules/**"
+  ]
+}

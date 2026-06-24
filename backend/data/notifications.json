@@ -1,0 +1,484 @@
+[
+  {
+    "_id": "17799462213602075",
+    "isRead": false,
+    "expenseId": "1779946221338606",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779265085762",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:30:21.360Z",
+    "updatedAt": "2026-05-28T05:30:21.360Z"
+  },
+  {
+    "_id": "17799462213608786",
+    "isRead": false,
+    "expenseId": "1779946221338606",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779293228421",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:30:21.360Z",
+    "updatedAt": "2026-05-28T05:30:21.360Z"
+  },
+  {
+    "_id": "17799462213609241",
+    "isRead": false,
+    "expenseId": "1779946221338606",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910678052",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:30:21.360Z",
+    "updatedAt": "2026-05-28T05:30:21.360Z"
+  },
+  {
+    "_id": "17799462213602915",
+    "isRead": false,
+    "expenseId": "1779946221338606",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910734664",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:30:21.360Z",
+    "updatedAt": "2026-05-28T05:30:21.360Z"
+  },
+  {
+    "_id": "1779946221362516",
+    "isRead": true,
+    "expenseId": "1779946221338606",
+    "metadata": {
+      "amount": 150000,
+      "auto": true
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Tự động xác nhận thanh toán",
+    "message": "Khoản thanh toán 150.000đ đã được hệ thống tự động xác nhận qua VietQR.",
+    "createdAt": "2026-05-28T05:30:21.362Z",
+    "updatedAt": "2026-05-28T05:31:12.852Z"
+  },
+  {
+    "_id": "17799465463384867",
+    "isRead": false,
+    "expenseId": "1779946546318938",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779265085762",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:35:46.338Z",
+    "updatedAt": "2026-05-28T05:35:46.338Z"
+  },
+  {
+    "_id": "17799465463381283",
+    "isRead": false,
+    "expenseId": "1779946546318938",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779293228421",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:35:46.338Z",
+    "updatedAt": "2026-05-28T05:35:46.338Z"
+  },
+  {
+    "_id": "17799465463387429",
+    "isRead": false,
+    "expenseId": "1779946546318938",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910678052",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:35:46.338Z",
+    "updatedAt": "2026-05-28T05:35:46.338Z"
+  },
+  {
+    "_id": "17799465463387025",
+    "isRead": false,
+    "expenseId": "1779946546318938",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910734664",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:35:46.338Z",
+    "updatedAt": "2026-05-28T05:35:46.338Z"
+  },
+  {
+    "_id": "1779946546343819",
+    "isRead": false,
+    "expenseId": "1779946546318938",
+    "metadata": {
+      "amount": 150000,
+      "auto": true
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Tự động xác nhận thanh toán",
+    "message": "Khoản thanh toán 150.000đ đã được hệ thống tự động xác nhận qua VietQR.",
+    "createdAt": "2026-05-28T05:35:46.343Z",
+    "updatedAt": "2026-05-28T05:35:46.343Z"
+  },
+  {
+    "_id": "17799465813618225",
+    "isRead": false,
+    "expenseId": "1779946581341353",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779265085762",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:36:21.361Z",
+    "updatedAt": "2026-05-28T05:36:21.361Z"
+  },
+  {
+    "_id": "17799465813612549",
+    "isRead": false,
+    "expenseId": "1779946581341353",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779293228421",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:36:21.361Z",
+    "updatedAt": "2026-05-28T05:36:21.361Z"
+  },
+  {
+    "_id": "17799465813617128",
+    "isRead": false,
+    "expenseId": "1779946581341353",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910678052",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:36:21.361Z",
+    "updatedAt": "2026-05-28T05:36:21.361Z"
+  },
+  {
+    "_id": "1779946581361863",
+    "isRead": false,
+    "expenseId": "1779946581341353",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910734664",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:36:21.361Z",
+    "updatedAt": "2026-05-28T05:36:21.361Z"
+  },
+  {
+    "_id": "1779946581365794",
+    "isRead": false,
+    "expenseId": "1779946581341353",
+    "metadata": {
+      "amount": 150000,
+      "auto": true
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Tự động xác nhận thanh toán",
+    "message": "Khoản thanh toán 150.000đ đã được hệ thống tự động xác nhận qua VietQR.",
+    "createdAt": "2026-05-28T05:36:21.365Z",
+    "updatedAt": "2026-05-28T05:36:21.365Z"
+  },
+  {
+    "_id": "17799467876759889",
+    "isRead": false,
+    "expenseId": "177994678765541",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779265085762",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:39:47.675Z",
+    "updatedAt": "2026-05-28T05:39:47.675Z"
+  },
+  {
+    "_id": "17799467876752017",
+    "isRead": false,
+    "expenseId": "177994678765541",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779293228421",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:39:47.675Z",
+    "updatedAt": "2026-05-28T05:39:47.675Z"
+  },
+  {
+    "_id": "1779946787675145",
+    "isRead": false,
+    "expenseId": "177994678765541",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910678052",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:39:47.675Z",
+    "updatedAt": "2026-05-28T05:39:47.675Z"
+  },
+  {
+    "_id": "17799467876756720",
+    "isRead": false,
+    "expenseId": "177994678765541",
+    "metadata": {
+      "amount": 150000,
+      "deadline": "2026-06-15",
+      "expenseTitle": "Phí võ phục hè 2026"
+    },
+    "userId": "1779910734664",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí võ phục hè 2026\" - 150.000đ. Hạn chót: 15/6/2026.",
+    "createdAt": "2026-05-28T05:39:47.675Z",
+    "updatedAt": "2026-05-28T05:39:47.675Z"
+  },
+  {
+    "_id": "1779946787680709",
+    "isRead": false,
+    "expenseId": "177994678765541",
+    "metadata": {
+      "amount": 150000,
+      "auto": true
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Tự động xác nhận thanh toán",
+    "message": "Khoản thanh toán 150.000đ đã được hệ thống tự động xác nhận qua VietQR.",
+    "createdAt": "2026-05-28T05:39:47.680Z",
+    "updatedAt": "2026-05-28T05:39:47.680Z"
+  },
+  {
+    "_id": "1779947045925152",
+    "isRead": false,
+    "expenseId": "177994685719035",
+    "metadata": {
+      "userName": "Nguyễn Mai Hương",
+      "amount": 20000
+    },
+    "userId": "system",
+    "type": "new_payment",
+    "title": "🔔 Thanh toán mới",
+    "message": "Nguyễn Mai Hương đã thanh toán \"Đóng góp tự do - Nguyễn Mai Hương\" - 20.000đ. Chờ xác nhận.",
+    "createdAt": "2026-05-28T05:44:05.925Z",
+    "updatedAt": "2026-05-28T05:44:05.925Z"
+  },
+  {
+    "_id": "1779947123337711",
+    "isRead": false,
+    "expenseId": "177994685719035",
+    "metadata": {
+      "amount": 20000
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Thanh toán đã xác nhận",
+    "message": "Khoản thanh toán 20.000đ đã được Admin xác nhận.",
+    "createdAt": "2026-05-28T05:45:23.337Z",
+    "updatedAt": "2026-05-28T05:45:23.337Z"
+  },
+  {
+    "_id": "17799651094024862",
+    "isRead": true,
+    "expenseId": "1779965109374596",
+    "metadata": {
+      "amount": 1600000,
+      "deadline": "2026-01-06",
+      "expenseTitle": "Phí quỹ tháng 5"
+    },
+    "userId": "1779265085762",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí quỹ tháng 5\" - 1.600.000đ. Hạn chót: 6/1/2026.",
+    "createdAt": "2026-05-28T10:45:09.402Z",
+    "updatedAt": "2026-05-28T10:45:49.458Z"
+  },
+  {
+    "_id": "17799651094023264",
+    "isRead": false,
+    "expenseId": "1779965109374596",
+    "metadata": {
+      "amount": 1600000,
+      "deadline": "2026-01-06",
+      "expenseTitle": "Phí quỹ tháng 5"
+    },
+    "userId": "1779293228421",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí quỹ tháng 5\" - 1.600.000đ. Hạn chót: 6/1/2026.",
+    "createdAt": "2026-05-28T10:45:09.402Z",
+    "updatedAt": "2026-05-28T10:45:09.402Z"
+  },
+  {
+    "_id": "1779965109402747",
+    "isRead": false,
+    "expenseId": "1779965109374596",
+    "metadata": {
+      "amount": 1600000,
+      "deadline": "2026-01-06",
+      "expenseTitle": "Phí quỹ tháng 5"
+    },
+    "userId": "1779910678052",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí quỹ tháng 5\" - 1.600.000đ. Hạn chót: 6/1/2026.",
+    "createdAt": "2026-05-28T10:45:09.402Z",
+    "updatedAt": "2026-05-28T10:45:09.402Z"
+  },
+  {
+    "_id": "1779965109402409",
+    "isRead": false,
+    "expenseId": "1779965109374596",
+    "metadata": {
+      "amount": 1600000,
+      "deadline": "2026-01-06",
+      "expenseTitle": "Phí quỹ tháng 5"
+    },
+    "userId": "1779910734664",
+    "type": "new_expense",
+    "title": "💰 Khoản chi mới",
+    "message": "Bạn có khoản chi mới \"Phí quỹ tháng 5\" - 1.600.000đ. Hạn chót: 6/1/2026.",
+    "createdAt": "2026-05-28T10:45:09.402Z",
+    "updatedAt": "2026-05-28T10:45:09.402Z"
+  },
+  {
+    "_id": "1779965197796938",
+    "isRead": false,
+    "expenseId": "1779965179861196",
+    "metadata": {
+      "userName": "Nguyễn Mai Hương",
+      "amount": 1600000
+    },
+    "userId": "system",
+    "type": "new_payment",
+    "title": "🔔 Thanh toán mới",
+    "message": "Nguyễn Mai Hương đã thanh toán \"Đóng góp tự do - Nguyễn Mai Hương\" - 1.600.000đ. Chờ xác nhận.",
+    "createdAt": "2026-05-28T10:46:37.796Z",
+    "updatedAt": "2026-05-28T10:46:37.796Z"
+  },
+  {
+    "_id": "1780060244652281",
+    "isRead": true,
+    "expenseId": "1779965179861196",
+    "metadata": {
+      "amount": 1600000
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Thanh toán đã xác nhận",
+    "message": "Khoản thanh toán 1.600.000đ đã được Admin xác nhận.",
+    "createdAt": "2026-05-29T13:10:44.652Z",
+    "updatedAt": "2026-05-29T17:04:57.716Z"
+  },
+  {
+    "_id": "1780074353798647",
+    "isRead": false,
+    "expenseId": "1780074314846218",
+    "metadata": {
+      "userName": "Nguyễn Mai Hương",
+      "amount": 50000
+    },
+    "userId": "system",
+    "type": "new_payment",
+    "title": "🔔 Thanh toán mới",
+    "message": "Nguyễn Mai Hương đã thanh toán \"Đóng góp tự do - Nguyễn Mai Hương\" - 50.000đ. Chờ xác nhận.",
+    "createdAt": "2026-05-29T17:05:53.798Z",
+    "updatedAt": "2026-05-29T17:05:53.798Z"
+  },
+  {
+    "_id": "1780074392902919",
+    "isRead": true,
+    "expenseId": "1780074314846218",
+    "metadata": {
+      "amount": 50000
+    },
+    "userId": "1779265085762",
+    "type": "payment_confirmed",
+    "title": "✅ Thanh toán đã xác nhận",
+    "message": "Khoản thanh toán 50.000đ đã được Admin xác nhận.",
+    "createdAt": "2026-05-29T17:06:32.902Z",
+    "updatedAt": "2026-05-31T05:36:16.650Z"
+  },
+  {
+    "_id": "1781544144665231",
+    "isRead": false,
+    "expenseId": "1781544126300321",
+    "metadata": {
+      "userName": "Nguyễn Mai Hương",
+      "amount": 50000
+    },
+    "userId": "system",
+    "type": "new_payment",
+    "title": "🔔 Thanh toán mới",
+    "message": "Nguyễn Mai Hương đã thanh toán \"Đóng góp tự do - Nguyễn Mai Hương\" - 50.000đ. Chờ xác nhận.",
+    "createdAt": "2026-06-15T17:22:24.665Z",
+    "updatedAt": "2026-06-15T17:22:24.665Z"
+  }
+]
