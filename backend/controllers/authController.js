@@ -49,11 +49,15 @@ const createSMTPTransporter = () => {
     console.warn('⚠️ SMTP_EMAIL hoặc SMTP_PASSWORD chưa được cấu hình!');
     return null;
   }
+  // Port 587 STARTTLS - hoạt động trên Render (port 465 SSL hay bị block)
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: { user: smtpEmail, pass: smtpPassword }
+    port: 587,
+    secure: false,    // false → STARTTLS
+    requireTLS: true,
+    auth: { user: smtpEmail, pass: smtpPassword },
+    connectionTimeout: 10000,
+    socketTimeout: 10000
   });
 };
 
@@ -248,11 +252,11 @@ export const login = async (req, res) => {
         $set: { otpCode, otpExpires }
       });
 
-      // Gửi OTP qua email bất đồng bộ (fire-and-forget)
-      // Không await để response login trả về ngay lập tức, không chờ SMTP
-      sendOTPEmail(user.email, otpCode, user.name).catch(err => {
-        console.error('❌ Background email send failed:', err.message);
-      });
+      // Await gửi email để bắt được lỗi nếu có
+      const emailSent = await sendOTPEmail(user.email, otpCode, user.name);
+      if (!emailSent) {
+        console.error('❌ Email OTP không gửi được - kiểm tra SMTP config!');
+      }
 
       return res.status(200).json({
         success: true,
