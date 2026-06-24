@@ -692,11 +692,13 @@ export const createFreeDeposit = async (req, res) => {
       status: 'pending'
     });
 
+    const ueObj = typeof userExpense.toObject === 'function' ? userExpense.toObject() : userExpense;
+
     res.status(201).json({
       success: true,
       message: 'Tạo khoản đóng góp thành công! Quét QR để nộp tiền.',
       userExpense: {
-        ...userExpense,
+        ...ueObj,
         expense: {
           title: expense.title,
           description: expense.description,

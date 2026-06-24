@@ -31,12 +31,14 @@ const PaymentModal = ({ isOpen, onClose, userExpense, onPaymentSuccess }) => {
   };
 
   const handleSubmitPayment = async () => {
+    if (!billFile) {
+      toast.error('Vui lòng tải lên ảnh minh chứng chuyển khoản.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      if (billFile) {
-        formData.append('bill', billFile);
-      }
+      formData.append('bill', billFile);
 
       await api.put(`/expenses/pay/${userExpense._id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -192,7 +194,7 @@ const PaymentModal = ({ isOpen, onClose, userExpense, onPaymentSuccess }) => {
           {/* Upload Bill */}
           {isPending && (
             <div className="space-y-3">
-              <p className="text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-wider">Ảnh minh chứng (tùy chọn)</p>
+              <p className="text-xs font-bold text-gray-500 dark:text-white/50 uppercase tracking-wider">Ảnh minh chứng (bắt buộc)</p>
               <label className="block w-full border-2 border-dashed border-gray-250 dark:border-white/15 rounded-xl p-4 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500/50 hover:bg-blue-50/30 dark:hover:bg-blue-500/10 transition-all">
                 <input
                   type="file"
