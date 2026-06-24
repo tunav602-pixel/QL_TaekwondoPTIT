@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircle, XCircle, Clock, Eye, Search, ShieldAlert, 
-  Check, Ban, AlertCircle, RefreshCw, FileText, Calendar, Mail
+  Check, Ban, AlertCircle, RefreshCw, FileText, Calendar, Mail,
+  X, Download
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api, { BACKEND_URL } from '../../lib/axios';
@@ -302,7 +303,7 @@ const DepositApproval = () => {
                     {/* View Bill Button */}
                     {app.billImageUrl ? (
                       <button
-                        onClick={() => setSelectedBill(app.billImageUrl)}
+                        onClick={() => setSelectedBill(app)}
                         className="flex items-center gap-1 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white/80 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95"
                         title="Xem hóa đơn thanh toán"
                       >
@@ -366,24 +367,118 @@ const DepositApproval = () => {
               className="fixed inset-0 bg-black/85 backdrop-blur-sm cursor-zoom-out"
             />
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl border border-white/10 shadow-2xl z-10 bg-[#0f172a]"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-4xl max-h-[90vh] md:max-h-[85vh] overflow-hidden rounded-3xl border border-white/10 shadow-2xl z-10 bg-[#0b0f19] flex flex-col md:flex-row text-white"
             >
-              <img
-                src={selectedBill.startsWith('http') ? selectedBill : `${BACKEND_URL}${selectedBill}`}
-                alt="Payment Bill"
-                className="w-full h-auto max-h-[80vh] object-contain"
-              />
-              <div className="p-3 border-t border-white/5 bg-[#0a0f1d] flex justify-between items-center">
-                <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Hóa Đơn Minh Chứng</span>
-                <button
-                  onClick={() => setSelectedBill(null)}
-                  className="bg-white/5 hover:bg-white/10 text-white/80 px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95"
-                >
-                  Đóng
-                </button>
+              {/* Left Column: Image container */}
+              <div className="flex-1 bg-black/40 flex items-center justify-center p-4 md:p-6 border-b md:border-b-0 md:border-r border-white/5 relative min-h-[350px] md:min-h-0 overflow-y-auto">
+                <img
+                  src={selectedBill.billImageUrl.startsWith('http') ? selectedBill.billImageUrl : `${BACKEND_URL}${selectedBill.billImageUrl}`}
+                  alt="Payment Bill"
+                  className="max-w-full max-h-[50vh] md:max-h-[72vh] object-contain rounded-2xl shadow-xl border border-white/5"
+                />
+              </div>
+
+              {/* Right Column: Transaction Details Panel */}
+              <div className="w-full md:w-80 bg-[#0f172a] p-5 md:p-6 flex flex-col justify-between border-t md:border-t-0 border-white/5 overflow-y-auto">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-blue-400 font-extrabold uppercase tracking-wider">Thông tin đối soát</span>
+                    <button
+                      onClick={() => setSelectedBill(null)}
+                      className="text-white/40 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Member Info */}
+                  <div className="space-y-1 bg-white/[0.02] border border-white/5 p-3 rounded-xl">
+                    <p className="text-[9px] font-bold text-white/30 uppercase">Người thực hiện</p>
+                    <p className="text-sm font-black text-white">{selectedBill.userName}</p>
+                    <p className="text-[10px] text-white/50 truncate">{selectedBill.userEmail}</p>
+                  </div>
+
+                  {/* Expense Title */}
+                  <div className="space-y-1 bg-white/[0.02] border border-white/5 p-3 rounded-xl">
+                    <p className="text-[9px] font-bold text-white/30 uppercase">Khoản nộp / Mục đích</p>
+                    <p className="text-xs font-semibold text-white/90">{selectedBill.expense?.title || 'Quản lý thu'}</p>
+                  </div>
+
+                  {/* Amount Card */}
+                  <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl p-3.5 shadow-inner">
+                    <p className="text-[9px] font-bold text-blue-400 uppercase tracking-wider">Số tiền nộp</p>
+                    <p className="text-xl font-black text-blue-400 mt-1">
+                      {(selectedBill.amount || 0).toLocaleString('vi-VN')}đ
+                    </p>
+                  </div>
+
+                  {/* Other details */}
+                  <div className="space-y-2.5 text-xs font-semibold text-white/60 bg-white/[0.02] border border-white/5 p-3 rounded-xl">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/30 text-[11px]">Nội dung CK:</span>
+                      <span className="font-mono text-white/90 bg-white/5 px-2 py-0.5 rounded text-[10px]">{selectedBill.transferContent || 'Trống'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/30 text-[11px]">Thời gian CK:</span>
+                      <span className="text-white/80 text-[11px]">
+                        {selectedBill.paidAt ? new Date(selectedBill.paidAt).toLocaleString('vi-VN') : 'Chưa cập nhật'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/30 text-[11px]">Trạng thái:</span>
+                      <span>{getStatusBadge(selectedBill.status)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick actions directly in the details panel */}
+                <div className="pt-5 border-t border-white/5 flex flex-col gap-2 mt-5">
+                  <div className="flex gap-2">
+                    <a
+                      href={selectedBill.billImageUrl.startsWith('http') ? selectedBill.billImageUrl : `${BACKEND_URL}${selectedBill.billImageUrl}`}
+                      download={`bill-${selectedBill.userName}-${selectedBill.amount}.jpg`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-white/80 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1"
+                      title="Tải ảnh hóa đơn về máy"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Tải về
+                    </a>
+                    <button
+                      onClick={() => setSelectedBill(null)}
+                      className="flex-1 py-2 bg-white/5 hover:bg-white/10 border border-white/5 text-white/80 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                    >
+                      Đóng
+                    </button>
+                  </div>
+                  {selectedBill.status === 'paid' && (
+                    <div className="flex gap-2 w-full">
+                      <button
+                        onClick={() => {
+                          handleConfirm(selectedBill._id, selectedBill.userName, selectedBill.amount);
+                          setSelectedBill(null);
+                        }}
+                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-xl cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1 shadow-lg shadow-emerald-500/10 text-xs font-bold"
+                        title="Duyệt giao dịch"
+                      >
+                        <Check className="w-4 h-4" /> Duyệt
+                      </button>
+                      <button
+                        onClick={() => {
+                          openRejectModal(selectedBill._id);
+                          setSelectedBill(null);
+                        }}
+                        className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1 shadow-lg shadow-red-500/10 text-xs font-bold"
+                        title="Từ chối giao dịch"
+                      >
+                        <Ban className="w-4 h-4" /> Từ chối
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           </div>
