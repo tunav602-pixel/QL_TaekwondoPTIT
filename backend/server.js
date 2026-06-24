@@ -16,6 +16,7 @@ import taskRoutes from './routes/taskRoutes.js';
 import { startEvaluationCron } from './utils/evaluationCron.js';
 import { globalErrorHandler } from './middlewares/errorHandler.js';
 import fs from 'fs';
+import { syncLocalDataToMongo } from './utils/dbSync.js';
 
 // Load environment variables
 dotenv.config();
@@ -116,6 +117,7 @@ app.use(globalErrorHandler);
 // ===== Start Server =====
 const startServer = async () => {
   await connectDB();
+  await syncLocalDataToMongo();
   app.listen(appConfig.port, () => {
     console.log(`\n🥋 ${appConfig.projectName} v${appConfig.projectVersion}`);
     console.log(`🚀 Server running on http://localhost:${appConfig.port}`);
