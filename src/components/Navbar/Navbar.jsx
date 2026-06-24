@@ -413,133 +413,134 @@ const Navbar = () => {
               <User className="w-4 h-4" /> Đăng nhập
             </Link>
           )}
+
+          {/* Mobile Menu Dropdown — Compact glass card inside the sticky navbar container */}
+          {isAuthenticated && isMobileMenuOpen && (
+            <div 
+              className="absolute right-4 top-full mt-2 w-52 z-[99] md:hidden animate-scaleIn rounded-xl border backdrop-blur-2xl shadow-xl transition-all duration-300" 
+              style={{ 
+                background: isDarkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+                borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(148, 163, 184, 0.2)'
+              }}
+            >
+              <div className="flex flex-col p-1.5 gap-0.5 max-h-[350px] overflow-y-auto dark-scrollbar text-left">
+                <NavLink
+                  to="/"
+                  end
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                    isActive 
+                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                      : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                  }`}
+                >
+                  Tổng quan
+                </NavLink>
+    
+                <NavLink
+                  to="/finance"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                    isActive 
+                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                      : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                  }`}
+                >
+                  Tài chính
+                </NavLink>
+    
+                <NavLink
+                  to="/transaction-history"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                    isActive 
+                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                      : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5 shrink-0" /> Lịch sử giao dịch
+                </NavLink>
+    
+                {/* Admin-only: Hội viên & Điểm danh & Khoản thu */}
+                {isAdmin && (
+                  <>
+                    <div className={`h-px my-0.5 bg-current opacity-10 ${isDarkMode ? 'text-white' : 'text-slate-400'}`} />
+                    
+                    <NavLink
+                      to="/members"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                        isActive 
+                          ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                          : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                      }`}
+                    >
+                      <Users className="w-3.5 h-3.5 shrink-0" /> Quản lý Hội viên
+                    </NavLink>
+                    <NavLink
+                      to="/attendance"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                        isActive 
+                          ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                          : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                      }`}
+                    >
+                      <CalendarCheck className="w-3.5 h-3.5 shrink-0" /> Điểm danh buổi tập
+                    </NavLink>
+                    <NavLink
+                      to="/expense-management"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                        isActive 
+                          ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                          : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                      }`}
+                    >
+                      <CreditCard className="w-3.5 h-3.5 shrink-0" /> Quản lý Khoản thu
+                    </NavLink>
+                    <NavLink
+                      to="/deposit-approval"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                        isActive 
+                          ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
+                          : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800')
+                      }`}
+                    >
+                      <CheckCheck className="w-3.5 h-3.5 shrink-0" /> Duyệt giao dịch
+                    </NavLink>
+                  </>
+                )}
+                
+                {/* Show "Đăng ký Admin" only for Super Admin */}
+                {isSuperAdmin && (
+                  <NavLink
+                    to="/admin-register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({isActive}) => `text-xs font-semibold py-1.5 px-2.5 rounded-lg transition-colors ${
+                      isActive 
+                        ? 'text-red-400 bg-red-500/10' 
+                        : (isDarkMode ? 'text-white/60 hover:bg-white/[0.04] hover:text-white' : 'text-slate-600 hover:bg-red-500 hover:bg-red-500/5')
+                    }`}
+                  >
+                    Đăng ký Admin
+                  </NavLink>
+                )}
+                
+                <div className={`h-px my-0.5 bg-current opacity-10 ${isDarkMode ? 'text-white' : 'text-slate-400'}`} />
+                <button
+                  onClick={handleLogout}
+                  className="text-xs font-bold py-1.5 px-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors text-left flex items-center gap-2 cursor-pointer w-full"
+                >
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-  
-      {/* Mobile Menu Overlay — RENDERED OUTSIDE THE STICKY CONTAINER TO PREVENT CONTAINING BLOCK CLIPPING */}
-      {isAuthenticated && isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 top-[84px] z-[99] md:hidden animate-fadeIn transition-all duration-300 overflow-y-auto" 
-          style={{ 
-            background: isDarkMode ? 'rgba(18, 18, 18, 0.98)' : 'rgba(255, 255, 255, 0.98)', 
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)'
-          }}
-        >
-          <div className="flex flex-col p-6 gap-2 pb-16">
-            <NavLink
-              to="/"
-              end
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors ${
-                isActive 
-                  ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                  : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-              }`}
-            >
-              Tổng quan
-            </NavLink>
-  
-            <NavLink
-              to="/finance"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors ${
-                isActive 
-                  ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                  : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-              }`}
-            >
-              Quản lý Tài chính
-            </NavLink>
-  
-            <NavLink
-              to="/transaction-history"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors flex items-center gap-2 ${
-                isActive 
-                  ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                  : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-              }`}
-            >
-              <CreditCard className="w-5 h-5" /> Lịch sử giao dịch
-            </NavLink>
-  
-            {/* Admin-only: Hội viên & Điểm danh & Khoản thu */}
-            {isAdmin && (
-              <>
-                <NavLink
-                  to="/members"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors flex items-center gap-2 ${
-                    isActive 
-                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                      : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-                  }`}
-                >
-                  <Users className="w-5 h-5" /> Quản lý Hội viên
-                </NavLink>
-                <NavLink
-                  to="/attendance"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors flex items-center gap-2 ${
-                    isActive 
-                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                      : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-                  }`}
-                >
-                  <CalendarCheck className="w-5 h-5" /> Điểm danh buổi tập
-                </NavLink>
-                <NavLink
-                  to="/expense-management"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors flex items-center gap-2 ${
-                    isActive 
-                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                      : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-                  }`}
-                >
-                  <CreditCard className="w-5 h-5" /> Quản lý Khoản thu
-                </NavLink>
-                <NavLink
-                  to="/deposit-approval"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors flex items-center gap-2 ${
-                    isActive 
-                      ? 'text-blue-500 dark:text-blue-400 bg-blue-500/10' 
-                      : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
-                  }`}
-                >
-                  <CheckCheck className="w-5 h-5" /> Duyệt giao dịch
-                </NavLink>
-              </>
-            )}
-            
-            {/* Show "Đăng ký Admin" only for Super Admin */}
-            {isSuperAdmin && (
-              <NavLink
-                to="/admin-register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={({isActive}) => `text-lg font-medium py-3 px-4 rounded-xl transition-colors ${
-                  isActive 
-                    ? 'text-red-400 bg-red-500/10' 
-                    : (isDarkMode ? 'text-white/60 hover:text-white hover:bg-white/[0.04]' : 'text-slate-600 hover:text-red-500 hover:bg-red-500/5')
-                }`}
-              >
-                Đăng ký Admin
-              </NavLink>
-            )}
-            
-            <div className={`h-px my-2 ${isDarkMode ? 'bg-white/[0.06]' : 'bg-slate-200'}`}></div>
-            <button
-              onClick={handleLogout}
-              className="text-lg font-semibold py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors text-left flex items-center gap-3 cursor-pointer"
-            >
-              <LogOut className="w-5 h-5" />
-              Đăng xuất
-            </button>
-          </div>
-        </div>
-      )}
   
       {/* Settings Modal */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
