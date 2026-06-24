@@ -89,7 +89,8 @@ app.get('/api/debug/status', async (req, res) => {
     hasResendKey: !!resendKey,
     maskedResendKey,
     nodeEnv: process.env.NODE_ENV,
-    port: process.env.PORT
+    port: process.env.PORT,
+    lastEmailStatus: global.lastEmailStatus || 'Chưa có lượt gửi nào'
   });
 });
 

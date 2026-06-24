@@ -95,6 +95,11 @@ const sendOTPEmail = async (email, otpCode, userName) => {
   const resend = getResendClient();
   if (!resend) {
     console.warn(`⚠️ Resend chưa cấu hình. OTP for ${email}: ${otpCode}`);
+    global.lastEmailStatus = {
+      success: false,
+      error: 'Resend client not configured',
+      timestamp: new Date().toISOString()
+    };
     return false;
   }
 
@@ -108,13 +113,29 @@ const sendOTPEmail = async (email, otpCode, userName) => {
 
     if (error) {
       console.error('❌ Resend error:', error);
+      global.lastEmailStatus = {
+        success: false,
+        error: error,
+        timestamp: new Date().toISOString()
+      };
       return false;
     }
 
     console.log(`✅ OTP email sent via Resend to ${email} | ID: ${data.id}`);
+    global.lastEmailStatus = {
+      success: true,
+      emailId: data.id,
+      recipient: email,
+      timestamp: new Date().toISOString()
+    };
     return true;
   } catch (err) {
     console.error('❌ Resend exception:', err.message);
+    global.lastEmailStatus = {
+      success: false,
+      error: err.message,
+      timestamp: new Date().toISOString()
+    };
     return false;
   }
 };
