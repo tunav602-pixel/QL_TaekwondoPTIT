@@ -55,37 +55,12 @@ const getResendClient = () => {
  * Tạo HTML template cho email OTP
  */
 const buildOTPHtml = (userName, otpCode) => `
-  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%); padding: 32px 24px; text-align: center;">
-      <h1 style="color: #ffffff; font-size: 22px; margin: 0 0 6px 0; font-weight: 800; letter-spacing: 1px;">🥋 TAEKWONDO PTIT</h1>
-      <p style="color: #93c5fd; font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Hệ Thống Quản Lý Tài Chính CLB</p>
-    </div>
-    <div style="padding: 32px 28px;">
-      <p style="color: #334155; font-size: 15px; margin: 0 0 20px 0; line-height: 1.6;">
-        Xin chào <strong style="color: #1e3a8a;">${userName}</strong>,
-      </p>
-      <p style="color: #475569; font-size: 14px; margin: 0 0 24px 0; line-height: 1.6;">
-        Bạn vừa yêu cầu đăng nhập vào hệ thống quản lý tài chính CLB Taekwondo PTIT. Đây là mã xác thực OTP của bạn:
-      </p>
-      <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 2px solid #bfdbfe; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
-        <p style="color: #64748b; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Mã OTP của bạn</p>
-        <p style="color: #1e3a8a; font-size: 36px; font-weight: 900; margin: 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otpCode}</p>
-      </div>
-      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 0 0 24px 0;">
-        <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
-          ⏱️ Mã OTP có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai.
-        </p>
-      </div>
-      <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;">
-        Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.
-      </p>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center;">
-      <p style="color: #94a3b8; font-size: 11px; margin: 0;">
-        © 2026 Taekwondo PTIT Club — Hệ thống quản lý tài chính CLB
-      </p>
-    </div>
-  </div>
+  <h3>Chào ${userName},</h3>
+  <p>Bạn vừa yêu cầu đăng nhập vào hệ thống quản lý tài chính CLB Taekwondo PTIT.</p>
+  <p>Mã OTP xác thực của bạn là: <strong style="font-size: 24px; color: #1e3a8a; letter-spacing: 2px;">${otpCode}</strong></p>
+  <p>Mã này có hiệu lực trong 5 phút. Vui lòng không chia sẻ với người khác.</p>
+  <br/>
+  <p>Trân trọng,<br/>Ban quản trị Taekwondo PTIT</p>
 `;
 
 /**
