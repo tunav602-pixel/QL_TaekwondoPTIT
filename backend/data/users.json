@@ -104,7 +104,7 @@
     "_id": "test-member-puppeteer-001",
     "name": "Test Member UI",
     "email": "testmember@ptit.test",
-    "password": "$2a$10$98G0dUtZvp2Q1cGrJUTfsuptqj05nkmIv2G0DoDR/T3mM2b/6w3zy",
+    "password": "$2a$10$dpBZBlhO54VgzqRUoMw0DegHdldEx0xxeDcOzxlfLlXYB2BmL.fWm",
     "role": "Member",
     "studentId": "TESTM001",
     "class": "TEST",

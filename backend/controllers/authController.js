@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import User from '../models/User.js';
 
 /**
@@ -40,122 +40,82 @@ const generateOTP = () => {
 };
 
 /**
- * Tạo Nodemailer transporter cho Gmail SMTP
+ * Khởi tạo Resend client
  */
-const createMailTransporter = () => {
-  const emailUser = process.env.SMTP_EMAIL;
-  const emailPass = process.env.SMTP_PASSWORD;
-  
-  if (!emailUser || !emailPass) {
-    console.log('⚠️ SMTP chưa cấu hình (SMTP_EMAIL / SMTP_PASSWORD) → Fallback console mode');
+const getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('⚠️ RESEND_API_KEY chưa được cấu hình!');
     return null;
   }
-
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // Use STARTTLS (more compatible with cloud platforms)
-    requireTLS: true,
-    auth: {
-      user: emailUser,
-      pass: emailPass
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000
-  });
+  return new Resend(apiKey);
 };
 
 /**
- * Send OTP via email - Gửi email thật qua Gmail SMTP
- * Fallback: In OTP ra console nếu SMTP chưa cấu hình
+ * Tạo HTML template cho email OTP
+ */
+const buildOTPHtml = (userName, otpCode) => `
+  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%); padding: 32px 24px; text-align: center;">
+      <h1 style="color: #ffffff; font-size: 22px; margin: 0 0 6px 0; font-weight: 800; letter-spacing: 1px;">🥋 TAEKWONDO PTIT</h1>
+      <p style="color: #93c5fd; font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Hệ Thống Quản Lý Tài Chính CLB</p>
+    </div>
+    <div style="padding: 32px 28px;">
+      <p style="color: #334155; font-size: 15px; margin: 0 0 20px 0; line-height: 1.6;">
+        Xin chào <strong style="color: #1e3a8a;">${userName}</strong>,
+      </p>
+      <p style="color: #475569; font-size: 14px; margin: 0 0 24px 0; line-height: 1.6;">
+        Bạn vừa yêu cầu đăng nhập vào hệ thống quản lý tài chính CLB Taekwondo PTIT. Đây là mã xác thực OTP của bạn:
+      </p>
+      <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 2px solid #bfdbfe; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
+        <p style="color: #64748b; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Mã OTP của bạn</p>
+        <p style="color: #1e3a8a; font-size: 36px; font-weight: 900; margin: 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otpCode}</p>
+      </div>
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 0 0 24px 0;">
+        <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
+          ⏱️ Mã OTP có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai.
+        </p>
+      </div>
+      <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;">
+        Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.
+      </p>
+    </div>
+    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center;">
+      <p style="color: #94a3b8; font-size: 11px; margin: 0;">
+        © 2026 Taekwondo PTIT Club — Hệ thống quản lý tài chính CLB
+      </p>
+    </div>
+  </div>
+`;
+
+/**
+ * Gửi OTP qua Resend (không bị chặn bởi Cloud platforms)
  */
 const sendOTPEmail = async (email, otpCode, userName) => {
-  const transporter = createMailTransporter();
-
-  // ===== FALLBACK: Console mode nếu SMTP chưa cấu hình =====
-  if (!transporter) {
-    console.log('\n' + '='.repeat(70));
-    console.log('📧 OTP EMAIL (CONSOLE FALLBACK - Cấu hình SMTP để gửi email thật)');
-    console.log('='.repeat(70));
-    console.log(`📬 To: ${email}`);
-    console.log(`👤 Name: ${userName}`);
-    console.log(`🔐 OTP Code: ${otpCode}`);
-    console.log(`⏱️  Valid for: 5 minutes`);
-    console.log('='.repeat(70) + '\n');
-    return false; // SMTP chưa cấu hình → Self-Healing: expose OTP trong response
+  const resend = getResendClient();
+  if (!resend) {
+    console.warn(`⚠️ Resend chưa cấu hình. OTP for ${email}: ${otpCode}`);
+    return false;
   }
 
-  // ===== GỬI EMAIL THẬT qua Gmail SMTP =====
   try {
-    const htmlContent = `
-      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%); padding: 32px 24px; text-align: center;">
-          <h1 style="color: #ffffff; font-size: 22px; margin: 0 0 6px 0; font-weight: 800; letter-spacing: 1px;">🥋 TAEKWONDO PTIT</h1>
-          <p style="color: #93c5fd; font-size: 11px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Hệ Thống Quản Lý Tài Chính CLB</p>
-        </div>
-        
-        <!-- Body -->
-        <div style="padding: 32px 28px;">
-          <p style="color: #334155; font-size: 15px; margin: 0 0 20px 0; line-height: 1.6;">
-            Xin chào <strong style="color: #1e3a8a;">${userName}</strong>,
-          </p>
-          <p style="color: #475569; font-size: 14px; margin: 0 0 24px 0; line-height: 1.6;">
-            Bạn vừa yêu cầu đăng nhập vào hệ thống quản lý tài chính CLB Taekwondo PTIT. Đây là mã xác thực OTP của bạn:
-          </p>
-          
-          <!-- OTP Code Box -->
-          <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border: 2px solid #bfdbfe; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px 0;">
-            <p style="color: #64748b; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Mã OTP của bạn</p>
-            <p style="color: #1e3a8a; font-size: 36px; font-weight: 900; margin: 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otpCode}</p>
-          </div>
-          
-          <!-- Warning -->
-          <div style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 0 0 24px 0;">
-            <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.5;">
-              ⏱️ Mã OTP có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này với bất kỳ ai.
-            </p>
-          </div>
-          
-          <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;">
-            Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn.
-          </p>
-        </div>
-        
-        <!-- Footer -->
-        <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center;">
-          <p style="color: #94a3b8; font-size: 11px; margin: 0;">
-            © 2026 Taekwondo PTIT Club — Hệ thống quản lý tài chính CLB
-          </p>
-        </div>
-      </div>
-    `;
-
-    const mailOptions = {
-      from: `"Taekwondo PTIT Finance" <${process.env.SMTP_EMAIL}>`,
-      to: email,
+    const { data, error } = await resend.emails.send({
+      from: 'Taekwondo PTIT <onboarding@resend.dev>',
+      to: [email],
       subject: '🔐 Mã OTP Đăng Nhập - Taekwondo PTIT Finance',
-      html: htmlContent
-    };
+      html: buildOTPHtml(userName, otpCode)
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log('\n' + '='.repeat(70));
-    console.log('✅ OTP EMAIL SENT SUCCESSFULLY');
-    console.log('='.repeat(70));
-    console.log(`📬 To: ${email}`);
-    console.log(`👤 Name: ${userName}`);
-    console.log(`📧 Message ID: ${info.messageId}`);
-    console.log(`🔐 OTP Code: ${otpCode}`);
-    console.log('='.repeat(70) + '\n');
-    
+    if (error) {
+      console.error('❌ Resend error:', error);
+      return false;
+    }
+
+    console.log(`✅ OTP email sent via Resend to ${email} | ID: ${data.id}`);
     return true;
-  } catch (error) {
-    console.error('\n❌ EMAIL SEND FAILED:', error.message);
-    console.log('⚠️ Self-Healing: OTP hiển thị trong console và sẽ được expose trong response');
-    console.log(`🔐 OTP Code: ${otpCode}`);
-    console.log(`📬 To: ${email}\n`);
-    return false; // Gửi email thật thất bại → Self-Healing: expose OTP trong response
+  } catch (err) {
+    console.error('❌ Resend exception:', err.message);
+    return false;
   }
 };
 
