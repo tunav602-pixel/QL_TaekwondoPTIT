@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import User from '../models/User.js';
 
 /**
@@ -40,27 +40,15 @@ const generateOTP = () => {
 };
 
 /**
- * Tạo SMTP transporter dùng Gmail App Password
+ * Khởi tạo Resend client
  */
-const createSMTPTransporter = () => {
-  const smtpEmail = process.env.SMTP_EMAIL;
-  const smtpPassword = process.env.SMTP_PASSWORD;
-  if (!smtpEmail || !smtpPassword) {
-    console.warn('⚠️ SMTP_EMAIL hoặc SMTP_PASSWORD chưa được cấu hình!');
+const getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('⚠️ RESEND_API_KEY chưa được cấu hình!');
     return null;
   }
-  // Port 587 STARTTLS - hoạt động trên Render (port 465 SSL hay bị block)
-  // family: 4 → bắt buộc dùng IPv4 (Render không hỗ trợ IPv6)
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,    // false → STARTTLS
-    requireTLS: true,
-    family: 4,        // Force IPv4 — fix lỗi ENETUNREACH trên Render
-    auth: { user: smtpEmail, pass: smtpPassword },
-    connectionTimeout: 10000,
-    socketTimeout: 10000
-  });
+  return new Resend(apiKey);
 };
 
 /**
@@ -76,39 +64,48 @@ const buildOTPHtml = (userName, otpCode) => `
 `;
 
 /**
- * Gửi OTP qua Gmail SMTP (nodemailer) — hoạt động được trên Render
+ * Gửi OTP qua Resend API (HTTPS - hoạt động trên mọi cloud platform)
  */
 const sendOTPEmail = async (email, otpCode, userName) => {
-  const transporter = createSMTPTransporter();
-  if (!transporter) {
-    console.warn(`⚠️ SMTP chưa cấu hình. OTP for ${email}: ${otpCode}`);
+  const resend = getResendClient();
+  if (!resend) {
+    console.warn(`⚠️ RESEND_API_KEY chưa cấu hình. OTP for ${email}: ${otpCode}`);
     global.lastEmailStatus = {
       success: false,
-      error: 'SMTP transporter not configured (SMTP_EMAIL/SMTP_PASSWORD missing)',
+      error: 'RESEND_API_KEY not configured',
       timestamp: new Date().toISOString()
     };
     return false;
   }
 
   try {
-    const smtpEmail = process.env.SMTP_EMAIL;
-    const info = await transporter.sendMail({
-      from: `"Taekwondo PTIT" <${smtpEmail}>`,
-      to: email,
-      subject: '🔐 Mã OTP Đăng Nhập - Taekwondo PTIT',
+    const { data, error } = await resend.emails.send({
+      from: 'Taekwondo PTIT <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Mã OTP Đăng Nhập - Taekwondo PTIT',
       html: buildOTPHtml(userName, otpCode)
     });
 
-    console.log(`✅ OTP email sent via Gmail SMTP to ${email} | MessageID: ${info.messageId}`);
+    if (error) {
+      console.error('❌ Resend error:', JSON.stringify(error));
+      global.lastEmailStatus = {
+        success: false,
+        error: JSON.stringify(error),
+        timestamp: new Date().toISOString()
+      };
+      return false;
+    }
+
+    console.log(`✅ OTP email sent via Resend to ${email} | ID: ${data.id}`);
     global.lastEmailStatus = {
       success: true,
-      messageId: info.messageId,
+      emailId: data.id,
       recipient: email,
       timestamp: new Date().toISOString()
     };
     return true;
   } catch (err) {
-    console.error('❌ SMTP exception:', err.message);
+    console.error('❌ Resend exception:', err.message);
     global.lastEmailStatus = {
       success: false,
       error: err.message,
@@ -117,6 +114,7 @@ const sendOTPEmail = async (email, otpCode, userName) => {
     return false;
   }
 };
+
 
 
 /**
