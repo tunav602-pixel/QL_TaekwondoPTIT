@@ -70,6 +70,20 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/tasks', taskRoutes);
 
+// TEMP DEBUG ENDPOINT - xóa sau khi fix xong
+app.get('/api/debug/status', (req, res) => {
+  const mongoUri = process.env.MONGO_URI || '';
+  // Ẩn password khỏi URI để log an toàn
+  const safeUri = mongoUri.replace(/:([^@]+)@/, ':***@');
+  res.json({
+    isMongoConnected: global.isMongoConnected,
+    mongoUriMasked: safeUri || 'KHÔNG CÓ (MONGO_URI chưa được set!)',
+    hasResendKey: !!process.env.RESEND_API_KEY,
+    nodeEnv: process.env.NODE_ENV,
+    port: process.env.PORT
+  });
+});
+
 // Health check — enhanced với project info (giống MoneyPrinterTurbo)
 app.get('/api/health', (req, res) => {
   res.json({
