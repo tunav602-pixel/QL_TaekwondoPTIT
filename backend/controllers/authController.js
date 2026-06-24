@@ -50,11 +50,13 @@ const createSMTPTransporter = () => {
     return null;
   }
   // Port 587 STARTTLS - hoạt động trên Render (port 465 SSL hay bị block)
+  // family: 4 → bắt buộc dùng IPv4 (Render không hỗ trợ IPv6)
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false,    // false → STARTTLS
     requireTLS: true,
+    family: 4,        // Force IPv4 — fix lỗi ENETUNREACH trên Render
     auth: { user: smtpEmail, pass: smtpPassword },
     connectionTimeout: 10000,
     socketTimeout: 10000
