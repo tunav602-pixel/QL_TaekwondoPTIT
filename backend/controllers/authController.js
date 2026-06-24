@@ -53,15 +53,15 @@ const createMailTransporter = () => {
 
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL/TLS
+    port: 587,
+    secure: false, // Use STARTTLS (more compatible with cloud platforms)
+    requireTLS: true,
     auth: {
       user: emailUser,
       pass: emailPass
     },
-    tls: {
-      rejectUnauthorized: false // Avoid connection issues with self-signed certs
-    }
+    connectionTimeout: 10000,
+    greetingTimeout: 10000
   });
 };
 
@@ -294,27 +294,19 @@ export const login = async (req, res) => {
         $set: { otpCode, otpExpires }
       });
 
-      // Send OTP via email — nhận kết quả để kiểm tra Self-Healing
-      const emailSentSuccessfully = await sendOTPEmail(user.email, otpCode, user.name);
+      // Gửi OTP qua email bất đồng bộ (fire-and-forget)
+      // Không await để response login trả về ngay lập tức, không chờ SMTP
+      sendOTPEmail(user.email, otpCode, user.name).catch(err => {
+        console.error('❌ Background email send failed:', err.message);
+      });
 
-      // Self-Healing logic: Expose OTP nếu email không gửi được
-      const shouldExposeOtp = !emailSentSuccessfully;
-      const responseData = {
+      return res.status(200).json({
         success: true,
         requireOTP: true,
-        message: emailSentSuccessfully
-          ? 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
-          : `⚠️ SMTP lỗi — Mã OTP: ${otpCode} (Self-Healing Mode)`,
+        message: 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.',
         userId: user._id,
         email: user.email
-      };
-
-      // Self-Healing: Expose OTP trong response nếu email thất bại
-      if (shouldExposeOtp) {
-        responseData.otpCode = otpCode;
-      }
-
-      return res.status(200).json(responseData);
+      });
     } else {
       // REGULAR MEMBER LOGIN: Direct login with JWT
       const token = generateToken(user._id);
@@ -451,15 +443,14 @@ export const resendOTP = async (req, res) => {
       $set: { otpCode, otpExpires }
     });
 
-    // Send OTP via email — Self-Healing
-    const emailSentSuccessfully = await sendOTPEmail(user.email, otpCode, user.name);
+    // Gửi OTP qua email bất đồng bộ (fire-and-forget)
+    sendOTPEmail(user.email, otpCode, user.name).catch(err => {
+      console.error('❌ Background resend email failed:', err.message);
+    });
 
     res.status(200).json({
       success: true,
-      message: emailSentSuccessfully
-        ? 'Mã OTP mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
-        : `⚠️ SMTP lỗi — Mã OTP: ${otpCode} (Self-Healing Mode)`,
-      ...( !emailSentSuccessfully && { otpCode } ) // Self-Healing: expose OTP nếu gửi mail thất bại
+      message: 'Mã OTP mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
     });
   } catch (error) {
     console.error('Resend OTP Error:', error);
