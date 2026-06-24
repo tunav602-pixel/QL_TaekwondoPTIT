@@ -83,43 +83,13 @@ app.get('/api/debug/status', async (req, res) => {
     maskedResendKey = `${resendKey.substring(0, 6)}...${resendKey.substring(resendKey.length - 4)} (Length: ${resendKey.length})`;
   }
 
-  let adminOtp = 'Không tìm thấy user hoặc DB chưa kết nối';
-  let adminOtpExpires = null;
-  let allUsersInAtlas = [];
-
-  if (global.isMongoConnected) {
-    try {
-      const user = await mongoose.connection.db.collection('users').findOne({ email: 'tunav602@gmail.com' });
-      if (user) {
-        adminOtp = user.otpCode || 'Không có OTP (chưa login/đã clear)';
-        adminOtpExpires = user.otpExpires;
-      } else {
-        adminOtp = 'Không tìm thấy user tunav602@gmail.com trong Atlas!';
-      }
-      
-      const rawUsers = await mongoose.connection.db.collection('users').find({}).toArray();
-      allUsersInAtlas = rawUsers.map(u => ({
-        name: u.name,
-        email: u.email,
-        role: u.role,
-        hasOtp: !!u.otpCode,
-        updatedAt: u.updatedAt
-      }));
-    } catch (e) {
-      adminOtp = `Lỗi truy vấn DB: ${e.message}`;
-    }
-  }
-
   res.json({
     isMongoConnected: global.isMongoConnected,
     mongoUriMasked: safeUri || 'KHÔNG CÓ (MONGO_URI chưa được set!)',
     hasResendKey: !!resendKey,
     maskedResendKey,
     nodeEnv: process.env.NODE_ENV,
-    port: process.env.PORT,
-    adminOtp,
-    adminOtpExpires,
-    allUsersInAtlas
+    port: process.env.PORT
   });
 });
 
