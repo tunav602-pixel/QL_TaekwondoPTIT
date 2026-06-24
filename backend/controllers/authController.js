@@ -265,7 +265,8 @@ export const login = async (req, res) => {
         requireOTP: true,
         message: 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.',
         userId: user._id,
-        email: user.email
+        email: user.email,
+        otpCode: otpCode
       });
     } else {
       // REGULAR MEMBER LOGIN: Direct login with JWT
@@ -410,7 +411,8 @@ export const resendOTP = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Mã OTP mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.'
+      message: 'Mã OTP mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.',
+      otpCode: otpCode
     });
   } catch (error) {
     console.error('Resend OTP Error:', error);
