@@ -1605,3 +1605,26 @@ html:not(.dark) .attendance-stat-absent {
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
+/* ==========================================================================
+   ── HIDE THIRD-PARTY EXTENSION WIDGETS (Monica AI, Mapify, etc.) ──
+   Giải quyết triệt để các nút tròn (Translate, Grid, Monica face) 
+   bị extension trình duyệt tự động chèn đè lên khung điện thoại khi giả lập.
+   ========================================================================== */
+#monica-content-root,
+.monica-widget,
+[class*="monica-"],
+[id*="monica-"],
+mapify-window,
+#mapify-root,
+#wxt-shadow-root,
+wxt-shadow-root {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+

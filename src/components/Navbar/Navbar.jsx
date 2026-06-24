@@ -416,13 +416,14 @@ const Navbar = () => {
       {/* Mobile Menu Overlay */}
       {isAuthenticated && isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 top-[76px] z-40 md:hidden animate-fadeIn transition-colors duration-300" 
+          className="fixed inset-0 top-[76px] z-[99] md:hidden animate-fadeIn transition-all duration-300 overflow-y-auto" 
           style={{ 
-            background: isDarkMode ? 'rgba(10,10,10,0.97)' : 'rgba(255,255,255,0.97)', 
-            backdropFilter: 'blur(32px)' 
+            background: isDarkMode ? 'rgba(18, 18, 18, 0.98)' : 'rgba(255, 255, 255, 0.98)', 
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)'
           }}
         >
-          <div className="flex flex-col p-6 gap-2">
+          <div className="flex flex-col p-6 gap-2 pb-16">
             <NavLink
               to="/"
               end
